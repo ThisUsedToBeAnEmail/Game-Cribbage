@@ -1,6 +1,6 @@
 package Game::Cribbage;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Rope;
 use Rope::Autoload;
@@ -173,108 +173,6 @@ sub play_hand {
 
 	return 1;
 }
-
-
-=pod
-
-
-sub init_play {
-	my ($self) = @_;
-
-	$self->clear_screen();	
-
-	$self->print_header(q|It is your turn to play a card.|);
-
-	my $hands = $self->board->get_hands;
-
-	unless (grep { !$_->{used} } @{$hands->player2->cards}, @{$hands->player1->cards}) {
-		$self->board->end_hands();
-		$self->init_draw(1);
-		return;
-	}
-
-	if (scalar keys %{$self->board->rounds->current_round->current_hands->cannot_play} == 2) {
-		eval { $self->board->next_play(); };
-		$self->init_play();
-		return;
-	}
-	
-	if ($self->board->next_to_play->player eq 'player1') { 
-		my $card = $self->board->best_run_play('player1');
-		if ($card->go) {
-			$self->board->cannot_play('player1');
-			$self->draw_go(6, 2);
-		} else {
-			$self->board->play_card('player1', $card);
-			if ($self->board->current_play_score == 31) {
-				$self->board->next_play();
-				$self->init_play();
-				return;
-			}	
-		}
-	}
-
-	if (scalar keys %{$self->board->rounds->current_round->current_hands->cannot_play} == 2) {
-		eval { $self->board->next_play(); };
-	
-		$self->init_play();
-		return;
-	}
-
-	if ($self->board->rounds->current_round->current_hands->cannot_play->{player2}) {
-		$self->init_play();
-		return;
-	}
-
-
-	$_[0]->draw_scores();
-
-	$self->render_opponent_cards(scalar grep { !$_->{used} } @{$hands->player1->cards});
-
-	$self->render_run_play();
-
-	$self->render_player_cards($hands->player2->cards, 20);
-
-	unless (grep { !$_->{used} } @{$hands->player2->cards}) {
-		$self->print_footer(q|No cards left to play|);
-		$self->cannot_play('player2');
-		$self->init_play();
-		return;
-	}
-
-	$self->print_footer(q|Pick a card: |);
-
-	my $number = <STDIN>;
-
-	chomp($number);
-
-	if ($number eq 'go') {
-		my @can = $self->board->cannot_play('player2');
-		if (scalar @can && ref $can[0]) {
-			$self->init_play();
-			return;
-		}
-		$self->draw_go(30);
-		$self->init_play();
-		return;
-	}
-	
-	if ($number !~ m/^\d+$/ || $number > scalar @{$hands->player2->cards}) {
-		$self->init_play();
-		return;
-	}
-
-	my $card = $self->board->get_card('player2', $number - 1);
-	$self->board->play_card('player2', $card);
-
-	if ($self->board->current_play_score == 31) {
-		$self->board->next_play();
-	}
-
-	$self->init_play;
-}
-
-=cut
 
 sub split_cards {
 	my ($self) = @_;
@@ -707,7 +605,7 @@ Game::Cribbage - Cribbage game engine
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
