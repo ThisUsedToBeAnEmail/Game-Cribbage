@@ -32,4 +32,5 @@ t/09-fixed_play.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+test.png
 xt/boilerplate.t

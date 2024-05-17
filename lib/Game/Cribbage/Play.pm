@@ -115,6 +115,8 @@ function force_card => sub {
 function end_play => sub {
 	my ($self) = @_;
 
+	return unless $self->cards->[0];
+
 	my $score = Game::Cribbage::Play::Score->new(
 		player => $self->cards->[-1]->player,
 		card => $self->cards->[-1],
@@ -146,7 +148,6 @@ function calculate_pair => sub {
 
 function calculate_run => sub {
 	my ($self, $score, $card) = @_; 
-use Data::Dumper;
 	my @cards = map { $_->card } @{$self->cards};
 	my @values = map { $_->run_value } (@cards, $card);
 	my $length = scalar @values - 1;
@@ -164,7 +165,6 @@ use Data::Dumper;
 			}
 		}
 		if ($match) {
-warn Dumper 'ALLREADY HAVE A TEST';
 			$score->run = $match;
 			last;
 		}
